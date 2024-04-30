@@ -1,0 +1,2 @@
+// this is the script that list the databes in mongodb
+show dbs
