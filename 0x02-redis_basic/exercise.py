@@ -8,6 +8,23 @@ from functools import wraps
 from typing import Union, Callable
 
 
+def replay(method: callable) -> None:
+    '''replay function history of calls of a particular function.'''
+    m = redis.Redis()
+    key = method.__qualname__
+    input = key + ":inputs"
+    output = key + ":outputs"
+    calls_n = m.get(key)
+    inputs = m.lrange(input, 0, -1)
+    outputs = m.lrange(output, 0, -1)
+    my_list = zip(inputs, outputs)
+    print(f"{key} was called {calls_n.decode('utf-8')} times:")
+    for tup in my_list:
+        first = tup[0].decode('utf-8')
+        last = tup[1].decode('utf-8')
+        print(f"{key}(*{first}) -> {last}")
+
+
 def call_history(method: Callable) -> Callable:
     '''function for making call history'''
     key = method.__qualname__
